@@ -1,56 +1,49 @@
 import React, { Component } from 'react'
 import TransactionForm from './TransactionForm'
+import { connect } from "react-redux";
+import * as actions from "../actions/TransactionActions";
+import { bindActionCreators } from "redux";
+
+//----------------REDUX---------------------
+//Redux is a state management package.
+//There is a redux store.
+//Data inside the redux store can be access from any react component.
+//Basically in redux, there are action, reducer and store.
+//Action is an object which represent an operation.
+//Reducer based on action
+//Reducer defines how to update current store data.
+//Inside the store save data which can be access through out the application.
+
+//How Redux works
+// Component => call "dispatch(action)" function => reach to "reducer" => Component
+
+//How to work with redux
+//Install redux and react-redux packages
+//First need to create Redux store
 
 class TransactionList extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            currentIndex: -1,
-            list: this.returnList()
-        }
-    }
-
-    returnList = () => {
-        if (localStorage.getItem('transaction') == null)
-            localStorage.setItem('transaction', JSON.stringify([]));
-        return JSON.parse(localStorage.getItem('transaction'))
-    }
-
-    onAddOrEdit = (data) => {
-        var list = this.returnList();
-        if (this.state.currentIndex == -1) {
-            list.push(data);
-        }
-        else {
-            list[this.state.currentIndex] = data;
-        }
-
-        localStorage.setItem('transaction', JSON.stringify(list));
-        this.setState({ list: list, currentIndex: -1 });
-
     }
 
     handleEdit = index => {
-        this.setState({ currentIndex: index });
+        this.props.updateTransactionIndex(index);
     }
 
     handleDelete = index => {
-        var list = this.returnList();
-        list.splice(index, 1);
-        localStorage.setItem('transaction', JSON.stringify(list));
-        this.setState({ list: list, currentIndex: -1 });
+        this.props.deleteTransaction(index);
     }
 
     render() {
         return (
             <div>
-                <TransactionForm onAddOrEdit={this.onAddOrEdit} currentIndex={this.state.currentIndex} list={this.state.list}></TransactionForm>
+                <TransactionForm></TransactionForm>
                 <hr />
                 <p>List of Transactions</p>
                 <table>
                     <tbody>
                         {
-                            this.state.list.map((item, index) => {
+                            this.props.list.map((item, index) => {
                                 return <tr key={index}>
                                     <td>{item.bAccountNo}</td>
                                     <td>{item.bName}</td>
@@ -67,4 +60,17 @@ class TransactionList extends Component {
     }
 }
 
-export default TransactionList;
+const mapStateToProps = state => {
+    return {
+        list: state.list
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators({
+        deleteTransaction: actions.Delete,
+        updateTransactionIndex: actions.UpdateIndex
+    }, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TransactionList);

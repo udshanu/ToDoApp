@@ -1,4 +1,8 @@
 import React, { Component } from 'react'
+import { connect } from "react-redux";
+import * as actions from "../actions/TransactionActions";
+import { bindActionCreators } from "redux";
+
 
 class TransactionForm extends Component {
     constructor(props) {
@@ -34,7 +38,10 @@ class TransactionForm extends Component {
 
     handleSubmit = e => {
         e.preventDefault(); //prevent a browser reload/refresh.
-        this.props.onAddOrEdit(this.state);
+        if (this.props.currentIndex == -1)
+            this.props.insertTransaction(this.state);
+        else
+            this.props.updateTransaction(this.state);
     }
 
     render() {
@@ -50,4 +57,18 @@ class TransactionForm extends Component {
     }
 }
 
-export default TransactionForm;
+const mapStateToProps = state => {
+    return {
+        list: state.list,
+        currentIndex: state.currentIndex
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators({
+        insertTransaction: actions.insert,
+        updateTransaction: actions.update
+    }, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TransactionForm);
