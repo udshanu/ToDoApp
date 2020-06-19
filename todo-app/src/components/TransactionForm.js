@@ -33,7 +33,7 @@ class TransactionForm extends Component {
     }
 
     handleSubmit = e => {
-        e.preventDefault();
+        e.preventDefault(); //prevent a browser reload/refresh.
         this.props.onAddOrEdit(this.state);
     }
 
